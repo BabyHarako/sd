@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WastePredict Davao - Waste Generation Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="Logo.png" alt="Logo" class="logo-image">
+                <div class="logo-text">
+                    <h1>WastePredict Davao</h1>
+                    <p>Predictive Modeling of Solid Waste Generation</p>
+                </div>
+            </div>
+            <div class="nav">
+                <a href="#predict">Predict</a>
+                <a href="#results">Results</a>
+                <a href="#training">Training</a>
+                <button id="themeToggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Waste Generation Prediction for Davao City</h2>
+            <p>Enter your parameters below to predict monthly waste generation using machine learning models</p>
+            <a href="#predict" class="btn">Start Predicting</a>
+        </div>
+    </section>
+    
+    <!-- Prediction Section -->
+    <section id="predict" class="section" style="background-color: var(--white);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Waste Generation Prediction</h2>
+                <p>Enter your parameters below. The system will automatically retrain after each prediction for continuous improvement.</p>
+            </div>
+            
+            <div class="prediction-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="population">Population Density (people/km²)</label>
+                        <input type="number" id="population" class="form-control" min="1000" max="20000" value="8500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="income">Average Household Income (PHP)</label>
+                        <input type="number" id="income" class="form-control" min="10000" max="50000" value="25000">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="urbanArea">Urban Land Use Area (km²)</label>
+                        <input type="number" id="urbanArea" class="form-control" min="50" max="500" value="280">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rainfall">Monthly Rainfall (mm)</label>
+                        <input type="number" id="rainfall" class="form-control" min="0" max="500" value="150">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="temperature">Average Temperature (°C)</label>
+                        <input type="number" id="temperature" class="form-control" min="20" max="35" value="28">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trucks">Collection Trucks (units)</label>
+                        <input type="number" id="trucks" class="form-control" min="10" max="100" value="45">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recycling">Recycling Rate (%)</label>
+                        <input type="number" id="recycling" class="form-control" min="5" max="50" value="18">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <select id="month" class="form-control">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <select id="year" class="form-control">
+                            <option value="2023">2023</option>
+                            <option value="2024" selected>2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="visibility: hidden;">Spacer</label>
+                        <button id="predictBtn" class="btn" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                            <i class="fas fa-chart-line"></i> Predict Waste Generation
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="predictionResult" class="prediction-result-card" style="display: none;">
+                <h3>Prediction Results</h3>
+                <div class="accuracy-results">
+                    <div class="accuracy-card">
+                        <h4>Random Forest</h4>
+                        <div class="accuracy-value" id="rfPrediction">-</div>
+                        <p>Predicted Waste (tons)</p>
+                    </div>
+                    <div class="accuracy-card">
+                        <h4>Linear Regression</h4>
+                        <div class="accuracy-value" id="lrPrediction">-</div>
+                        <p>Predicted Waste (tons)</p>
+                    </div>
+                    <div class="accuracy-card">
+                        <h4>XGBoost</h4>
+                        <div class="accuracy-value" id="xgbPrediction">-</div>
+                        <p>Predicted Waste (tons)</p>
+                    </div>
+                </div>
+                <div class="recommendation-box">
+                    <p><strong>Note:</strong> Models will be automatically retrained with your prediction data to improve accuracy for future predictions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Training Section -->
+    <section id="training" class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Model Training Status</h2>
+                <p>Models train automatically on startup and after each prediction</p>
+            </div>
+            
+            <div class="training-section">
+                <div class="model-controls">
+                    <button id="trainRF" class="btn">Re-train Random Forest</button>
+                    <button id="trainLR" class="btn">Re-train Linear Regression</button>
+                    <button id="trainXGB" class="btn">Re-train XGBoost</button>
+                    <button id="trainAll" class="btn">Re-train All Models</button>
+                </div>
+                
+                <div class="training-progress-container">
+                    <h4 style="margin-bottom: 0.5rem;">Training Progress</h4>
+                    <div class="training-progress">
+                        <div class="progress-bar" id="progressBar">0%</div>
+                    </div>
+                </div>
+                
+                <div class="training-log" id="trainingLog">
+                    <!-- Training logs will appear here -->
+                    <div>System initializing... Training models automatically...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Results Section -->
+    <section id="results" class="section" style="background-color: var(--white);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Model Performance Results</h2>
+                <p>Accuracy metrics: RMSE, MAE, MAPE (Lower is better for RMSE/MAE, Higher is better for Accuracy)</p>
+            </div>
+            
+            <div class="accuracy-results">
+                <div class="accuracy-card">
+                    <h3>Random Forest</h3>
+                    <div class="accuracy-value" id="rfAccuracy">-</div>
+                    <p>RMSE: <span id="rfRMSE">-</span> tons</p>
+                    <p>MAE: <span id="rfMAE">-</span> tons</p>
+                    <p>MAPE: <span id="rfMAPE">-</span>%</p>
+                </div>
+                
+                <div class="accuracy-card">
+                    <h3>Linear Regression</h3>
+                    <div class="accuracy-value" id="lrAccuracy">-</div>
+                    <p>RMSE: <span id="lrRMSE">-</span> tons</p>
+                    <p>MAE: <span id="lrMAE">-</span> tons</p>
+                    <p>MAPE: <span id="lrMAPE">-</span>%</p>
+                </div>
+                
+                <div class="accuracy-card">
+                    <h3>XGBoost</h3>
+                    <div class="accuracy-value" id="xgbAccuracy">-</div>
+                    <p>RMSE: <span id="xgbRMSE">-</span> tons</p>
+                    <p>MAE: <span id="xgbMAE">-</span> tons</p>
+                    <p>MAPE: <span id="xgbMAPE">-</span>%</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Model Performance Comparison</h3>
+                <canvas id="performanceChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title">Prediction vs Training Data</h3>
+                <canvas id="predictionChart"></canvas>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>WastePredict Davao</h3>
+                    <p>Machine Learning-based Waste Prediction System</p>
+                    <p>University of Science and Technology of Southern Philippines</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Research Team</h3>
+                    <ul>
+                        <li>Cruz, John Lorenz V.</li>
+                        <li>Caliso, Herson</li>
+                        <li>Antivo, Ken Angelo</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Adviser</h3>
+                    <ul>
+                        <li>Engr. Jodie Rey Fernandez</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Course</h3>
+                    <ul>
+                        <li>EC 311 CPE Elective 1</li>
+                        <li>1st Semester, AY 2025-2026</li>
+                        <li>CPE-3D</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 WastePredict Davao - Predictive Modeling of Solid Waste Generation Using Machine Learning</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Load JavaScript files -->
+    <script src="Utils.js"></script>
+    <script src="DatasetManager.js"></script>
+    <script src="MLModels.js"></script>
+    <script src="ChartManager.js"></script>
+    <script src="UIComponents.js"></script>
+    <script src="ThemeManager.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
